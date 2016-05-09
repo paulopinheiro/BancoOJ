@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+    <ui:composition template="./resources/templates/menuSuperior.xhtml">
+        <ui:define name="titulo">Cadastro de Locais - Cidades/Bairros</ui:define>
+        <ui:define name="top">Cadastro de Locais - Cidades/Bairros</ui:define>
+
+        <ui:define name="content">
+            <h:form id="formCidade">
+                <p:panelGrid id="gridCidade" columns="2">
+                    <p:outputLabel id="labelNome" for="nome" value="Nome" />
+                    <p:inputText id="nome" value="#{cidadeMB.cidade.nome}" size="65" onkeydown="limitText(this, 50);" onkeyup="limitText(this, 50);"/>
+                    <p:outputLabel id="labelUF" for="uf" value="UF" />
+                    <p:inputText id="uf" value="#{cidadeMB.cidade.uf}" size="5" onkeydown="limitText(this, 2);" onkeyup="limitText(this, 2);"/>
+                    <p:outputLabel id="labelJurisdicao" for="listaJurisdicoes" value="Jurisdição" />
+                    <p:selectOneMenu id="listaJurisdicoes" label="Jurisdicao" value="#{cidadeMB.cidade.jurisdicao}" converter="converteJurisdicao" >
+                        <f:selectItem noSelectionOption="true" itemValue="-1" itemLabel="-- Selecione uma Jurisdição --" />
+                        <f:selectItems value="#{cidadeMB.listaJurisdicoes}" var="jurisdicao" itemValue="#{jurisdicao}" itemLabel="#{jurisdicao}" />
+                    </p:selectOneMenu>
+                </p:panelGrid>
+                <p:panelGrid id="botoesCidade" columns="4">
+                    <p:commandButton ajax="false" id="btSalvar" actionListener="#{cidadeMB.salvar}" value="Salvar">
+                        <f:ajax execute="@form" render="@form :tabCidades :msgerro :gmensagem" />
+                    </p:commandButton>
+                    <p:commandButton ajax="false" id="btNovo" actionListener="#{cidadeMB.nova}" value="Nova">
+                        <f:ajax execute="@form" render="@form :msgerro :gmensagem" />
+                    </p:commandButton>
+                    <p:commandButton ajax="false" id="btExcluir" actionListener="#{cidadeMB.excluir}" value="Excluir" disabled="#{cidadeMB.novaCidade}" onclick="if (!confirm('Tem certeza de que deseja excluir esta cidade?')) return false;" >
+                        <f:ajax execute="@form" render="@form :tabCidades :msgerro :gmensagem" />
+                    </p:commandButton>
+                    <p:commandButton value="Voltar" action="home" />
+                </p:panelGrid>
+            </h:form>
+            <p:growl id="gmensagem" globalOnly="true" />
+            <p:messages id="msgerro" globalOnly="true" />
+            <h:form id="tabCidades">
+                <p:dataTable id="tabelaCidades" var="cidade" value="#{cidadeMB.listaCidades}" paginator="true" rows="10" paginatorPosition="bottom" tableStyle="width:auto">
+                    <f:facet name="header"><h:outputText value="Cidades cadastradas" /></f:facet>
+                    <p:column style="white-space: normal" id="colunaNome"><f:facet name="header"><h:outputText id="textoNome" value="Nome" /></f:facet>
+                        <p:commandLink ajax="false" id="clinkNome" value="#{cidade.nome}">
+                            <f:setPropertyActionListener value="#{cidade}" target="#{cidadeMB.cidade}" />
+                            <f:ajax execute="@this" render=":formCidade :msgerro :gmensagem" />
+                        </p:commandLink>
+                    </p:column>
+                    <p:column id="colunaUF"><f:facet name="header"><h:outputText id="textoUF" value="UF" /></f:facet>
+                        <h:outputText id="campoUF" value="#{cidade.uf}" />
+                    </p:column>
+                    <p:column id="colunaJurisdicao"><f:facet name="header"><h:outputText id="textoJurisdicao" value="Jurisdição" /></f:facet>
+                        <h:outputText id="campoJurisdicao" value="#{cidade.jurisdicao}" />
+                    </p:column>
+                    <p:column id="colunaBairros"><f:facet name="header"><h:outputText id="textoBairros" value="Bairros" /></f:facet>
+                        <h:link id="linkBairros" outcome="cadBairro" value="Ver">
+                            <f:param name="cidadeCod" value="#{cidade.codigo}" />
+                        </h:link>
+                    </p:column>
+                    <f:facet name="footer"><h:outputText value="Total: #{cidadeMB.quantCidades}" /></f:facet>
+                </p:dataTable>
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</html>

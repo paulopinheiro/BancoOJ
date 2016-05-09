@@ -1,0 +1,127 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+    <f:metadata>
+        <f:viewParam id="parteCod" name="parteCod" value="#{parteMB.parte}" converter="#{parteConverterMB}" required="false" />
+    </f:metadata>
+
+    <ui:composition template="./resources/templates/menuSuperior.xhtml">
+        <ui:define name="titulo">Cadastro da Parte</ui:define>
+        <ui:define name="top">Cadastro da Parte</ui:define>
+
+        <ui:define name="content">
+            <h:form id="formParte">
+                <p:panelGrid id="gridPartePrincipal" columns="3">
+                    <f:facet name="header"><b>Dados da Parte</b></f:facet>
+                    <p:outputLabel id="labelNome" for="nome" value="Nome" />
+                    <p:inputText id="nome" value="#{parteMB.parte.nome}" size="65" onkeydown="limitText(this, 50);" onkeyup="limitText(this, 50);"/>
+                    <p:message for="nome" id="msgNome" />
+                    <p:outputLabel id="labelcpf_cnpj" for="cpf_cnpj" value="CPF/CNPJ" />
+                    <p:panelGrid id="gridCpfCnpj" columns="3">
+                        <p:inputText id="cpf_cnpj" value="#{parteMB.parte.cpfCnpj}" size="30" onkeydown="limitText(this, 14); doCheckNatural(this);" onkeyup="limitText(this, 14); doCheckNatural(this);">
+                            <f:ajax event="keyup" render=":formParte:maskcpf_cnpj" />
+                        </p:inputText>
+                        <p:outputLabel id="labelmaskcpf_cnpj" for="maskcpf_cnpj" value="No formato:" />
+                        <h:outputText transient="true" id="maskcpf_cnpj" value="#{parteMB.parte.cpfCnpj}" converter="converteCpfCnpj" />
+                    </p:panelGrid>
+                    <p:message for="cpf_cnpj" id="msgcpf_cnpj" />
+                    <p:outputLabel id="labelLogradouro" for="logradouro" value="Logradouro" />
+                    <p:inputText id="logradouro" value="#{parteMB.parte.logradouro}" size="65" onkeydown="limitText(this, 50);" onkeyup="limitText(this, 50);"/>
+                    <p:message for="logradouro" id="msgLogradouro" />
+                </p:panelGrid>
+                <p:panelGrid id="gridParteComplementos" columns="4">
+                    <p:outputLabel id="labelNumero" for="numero" value="Número" />
+                    <p:inputText id="numero" value="#{parteMB.parte.numero}" size="8" onkeydown="limitText(this, 5);" onkeyup="limitText(this, 5);"/>
+                    <p:outputLabel id="labelComplemento" for="complemento" value="Complemento" />
+                    <p:inputText id="complemento" value="#{parteMB.parte.complemento}" size="35" onkeydown="limitText(this, 20);" onkeyup="limitText(this, 20);"/>
+                </p:panelGrid>
+                <p:panelGrid id="gridCidadeBairro" columns="6">
+                    <p:outputLabel id="labelCidade" for="listaCidades" value="Cidade" />
+                    <p:selectOneMenu id="listaCidades" label="Cidades" value="#{parteMB.cidade}" converter="converteCidade" >
+                        <f:selectItem noSelectionOption="true" itemValue="-1" itemLabel="-- Selecione uma cidade --" />
+                        <f:selectItems value="#{parteMB.cidades}" var="cidade" itemValue="#{cidade}" itemLabel="#{cidade}" />
+                        <f:ajax event="change" listener="#{parteMB.alteracaoCidade}" execute="@this" render="formParte:listaBairros" />
+                    </p:selectOneMenu>
+                    <p:message for="listaCidades" id="msgListaCidades" />
+                    <p:outputLabel id="labelBairro" for="listaBairros" value="Bairro" />
+                    <p:selectOneMenu id="listaBairros" label="Bairros" value="#{parteMB.parte.bairro}" converter="converteBairro" >
+                        <f:selectItem noSelectionOption="true" itemValue="-1" itemLabel="-- Selecione um bairro --" />
+                        <f:selectItems value="#{parteMB.bairros}" var="bairro" itemValue="#{bairro}" itemLabel="#{bairro.nome}" />
+                    </p:selectOneMenu>
+                    <p:message for="listaBairros" id="msgListaBairros" />
+                </p:panelGrid>
+                <p:panelGrid id="gridParteOutrasInformacoes" columns="2">
+                    <p:outputLabel id="labelTelefone" for="telefone" value="Telefone" />
+                    <p:inputText id="telefone" value="#{parteMB.parte.telefone}" size="35" onkeydown="limitText(this, 20);" onkeyup="limitText(this, 20);" />
+                    <p:outputLabel id="labelContato" for="contato" value="Contato responsável" />
+                    <p:inputText id="contato" value="#{parteMB.parte.contatoResponsavel}" size="65" onkeydown="limitText(this, 50);" onkeyup="limitText(this, 50);"/>
+                    <p:outputLabel id="labelObservacao" for="observacao" value="Observação" />
+                    <p:inputText id="observacao" value="#{parteMB.parte.observacao}" size="65" onkeydown="limitText(this, 50);" onkeyup="limitText(this, 50);"/>
+                </p:panelGrid>
+                <p:panelGrid id="gridBotoesParte" columns="4">
+                    <p:commandButton ajax="false" value="Salvar" actionListener="#{parteMB.salvar}">
+                        <f:ajax execute="@form" render="@form :formHistorico :msgerro :gmensagem" />
+                    </p:commandButton>
+                    <p:commandButton ajax="false" value="Nova" actionListener="#{parteMB.nova}">
+                        <f:ajax execute="@form" render="@form :formHistorico :msgerro :gmensagem" />
+                    </p:commandButton>
+                    <p:commandButton ajax="false" disabled="#{parteMB.novaParte}" value="Excluir" actionListener="#{parteMB.excluir}" onclick="if (!confirm('Tem certeza de que deseja excluir esta parte e seu histórico?')) return false;" >
+                        <f:ajax execute="@form" render="@form :formHistorico :msgerro :gmensagem" />
+                    </p:commandButton>
+                    <p:commandButton value="Voltar" action="home" />
+                </p:panelGrid>
+            </h:form>
+            <p:growl id="gmensagem" globalOnly="true" />
+            <p:messages id="msgerro" globalOnly="true" showDetail="false" showSummary="true"/>
+            <br />
+            <h:form id="formHistorico">
+                <p:panelGrid id="gridHistorico" columns="2" rendered="#{!parteMB.novaParte}">
+                    <f:facet name="header"><b>Histórico</b></f:facet>
+                    <p:outputLabel id="labelDataHistorico" for="dataHistorico" value="Data" />
+                    <p:calendar id="dataHistorico" value="#{parteMB.historico.datahistorico}" showOn="button" locale="pt" showButtonPanel="true" navigator="true" />
+                    <p:outputLabel id="labelDescricaoHistorico" for="descricaoHistorico" value="Descrição" />
+                    <p:inputTextarea id="descricaoHistorico" cols="60" rows="4" value="#{parteMB.historico.descricao}" onkeydown="limitText(this, 200);" onkeyup="limitText(this, 200);" />
+                    <p:outputLabel id="labelObservacaoHistorico" for="observacaoHistorico" value="Observação" />
+                    <p:inputText id="observacaoHistorico" value="#{parteMB.historico.observacao}" size="65" onkeydown="limitText(this, 50);" onkeyup="limitText(this, 50);"/>
+                    <p:outputLabel id="labelOficialHistorico" for="oficialHistorico" value="OJ Responsável" />
+                    <h:outputText id="oficialHistorico" value="#{parteMB.historico.oficial}" />
+                </p:panelGrid>
+                <p:panelGrid id="gridBotoesHistorico" columns="3" rendered="#{!parteMB.novaParte}">
+                    <p:commandButton ajax="false" value="Salvar" actionListener="#{parteMB.salvarHistorico}">
+                        <f:ajax execute="@form" render="@form :msgerro :gmensagem" />
+                    </p:commandButton>
+                    <p:commandButton ajax="false" value="Novo" actionListener="#{parteMB.novoHistorico}">
+                        <f:ajax execute="@form" render="@form :msgerro :gmensagem" />
+                    </p:commandButton>
+                    <p:commandButton ajax="false" disabled="#{parteMB.novoHistoricoB}" value="Excluir" actionListener="#{parteMB.excluirHistorico}">
+                        <f:ajax execute="@form" render="@form :msgerro :gmensagem" />
+                    </p:commandButton>
+                </p:panelGrid>
+                <p:panelGrid id="panelTabHistoricos" columns="1" rendered="#{!parteMB.novaParte}">
+                    <p:dataTable id="tabelaHistoricos" var="historico" value="#{parteMB.parte.listaHistorico}" tableStyle="width:auto">
+                        <f:facet name="header"><h:outputText id="headerDtHistoricos" value="Históricos da parte" /></f:facet>
+                        <p:column id="colunaData" ><f:facet name="header"><h:outputText id="headerData" value="Data" /></f:facet>
+                            <p:commandLink ajax="false" id="linkEditaTarefa">
+                                <h:outputText value="#{historico.datahistorico}">
+                                    <f:convertDateTime parent="dd/MM/yyyy" />
+                                </h:outputText>
+                                <f:setPropertyActionListener value="#{historico}" target="#{parteMB.historico}" />
+                                <f:ajax render=":formHistorico:gridHistorico :formHistorico:gridBotoesHistorico :msgerro :gmensagem" />
+                            </p:commandLink>
+                        </p:column>
+                        <p:column style="white-space: normal" id="colunaDescricao" ><f:facet name="header"><h:outputText id="headerDescricao" value="Descrição" /></f:facet>
+                            <h:outputText id="descricao"  value="#{historico.descricao}"  />
+                        </p:column>
+                        <p:column style="white-space: normal" id="colunaResponsavel" ><f:facet name="header"><h:outputText id="headerResponsavel" value="OJ Responsável" /></f:facet>
+                            <h:outputText id="responsavel"  value="#{historico.oficial}"  />
+                        </p:column>
+                    </p:dataTable>
+                </p:panelGrid>
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</html>

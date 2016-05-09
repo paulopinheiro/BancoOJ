@@ -1,0 +1,83 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+    <ui:composition template="./resources/templates/menuSuperior.xhtml">
+        <ui:define name="titulo">Sistema de Apoio ao Oficial de Justiça - BancoOJ</ui:define>
+        <ui:define name="top">Sistema de Apoio ao Oficial de Justiça - BancoOJ</ui:define>
+
+        <ui:define name="content">
+            <h:form id="formFiltraParte">
+                <p:panelGrid id="gridFiltros" columns="4">
+                    <f:facet name="header"><h:outputText value="Filtrar Partes" /></f:facet>
+                    <p:outputLabel for="filtroJurisdicao" id="labelJurisdicao" value="Jurisdição" />
+                    <p:selectOneMenu id="filtroJurisdicao" label="labelJurisdicao" value="#{listaPartesMB.filtroJurisdicao}" converter="converteJurisdicao" >
+                        <f:selectItem noSelectionOption="true" itemValue="-1" itemLabel="-- Todas as jurisdições --" />
+                        <f:selectItems value="#{listaPartesMB.listaJurisdicoes}" var="jurisdicao" itemValue="#{jurisdicao}" itemLabel="#{jurisdicao}" />
+                        <f:ajax event="change" listener="#{listaPartesMB.alteracaoJurisdicao}" execute="@this" render=":formFiltraParte:filtroCidade :formFiltraParte:filtroBairro :msgerro :gmensagem" />
+                    </p:selectOneMenu>
+                    <h:outputText id="placeHolder1" value="" />
+                    <h:outputText id="placeHolder2" value="" />
+                    <p:outputLabel id="labelCidade" for="filtroCidade" value="Cidade" />
+                    <p:selectOneMenu id="filtroCidade" label="Cidade" value="#{listaPartesMB.filtroCidade}" converter="converteCidade" >
+                        <f:selectItem noSelectionOption="true" itemValue="-1" itemLabel="-- Todas as cidades --" />
+                        <f:selectItems value="#{listaPartesMB.listaCidades}" var="cidade" itemValue="#{cidade}" itemLabel="#{cidade}" />
+                        <f:ajax event="change" listener="#{listaPartesMB.alteracaoCidade}" execute="@this" render="formFiltraParte:filtroBairro" />
+                    </p:selectOneMenu>
+                    <p:outputLabel id="labelBairro" for="filtroBairro" value="Bairro" />
+                    <p:selectOneMenu id="filtroBairro" label="Bairros" value="#{listaPartesMB.filtroBairro}" converter="converteBairro" >
+                        <f:selectItem noSelectionOption="true" itemValue="-1" itemLabel="-- Todos os bairros --" />
+                        <f:selectItems value="#{listaPartesMB.listaBairros}" var="bairro" itemValue="#{bairro}" itemLabel="#{bairro.nome}" />
+                    </p:selectOneMenu>
+                </p:panelGrid>
+                <p:panelGrid id="gridFiltros2" columns="3">
+                    <p:outputLabel id="labelNome" for="filtroNome" value="Nome" />
+                    <p:inputText id="filtroNome" value="#{listaPartesMB.filtroNomeParte}" size="65" onkeydown="limitText(this, 50);" onkeyup="limitText(this, 50);"/>
+                    <p:commandButton value="Filtrar" actionListener="#{listaPartesMB.filtrar}">
+                        <f:ajax execute="@form" render=":tabPartes :msgerro :gmensagem" />
+                    </p:commandButton>
+                </p:panelGrid>
+                <br />
+                <p:panelGrid id="gridFiltroCpfCnpj" columns="4">
+                    <p:outputLabel id="labelCpf_cnpj" value="CPF/CNPJ" />
+                    <p:panelGrid id="gridCpfCnpj" columns="3">
+                        <p:inputText id="cpf_cnpj" value="#{listaPartesMB.cpfCnpj}" size="30" onkeydown="limitText(this, 14);doCheckNatural(this);" onkeyup="limitText(this, 14);doCheckNatural(this);">
+                            <f:ajax event="keyup" render=":formFiltraParte:maskcpf_cnpj" />
+                        </p:inputText>
+                        <p:outputLabel id="labelmaskcpf_cnpj" for="maskcpf_cnpj" value="No formato:" />
+                        <h:outputText transient="true" id="maskcpf_cnpj" value="#{listaPartesMB.cpfCnpj}" converter="converteCpfCnpj" />
+                    </p:panelGrid>
+                    <p:commandButton value="Filtrar" actionListener="#{listaPartesMB.filtrarCpfCnpj}">
+                        <f:ajax execute="@form" render=":tabPartes :msgerro :gmensagem" />
+                    </p:commandButton>
+                </p:panelGrid>
+                <br />
+                <p:panelGrid id="outrasFuncoes" columns="1">
+                    <p:commandLink id="linkNovaParte" value="Nova Parte" action="/cadParte" />
+                </p:panelGrid>
+            </h:form>
+            <p:growl id="gmensagem" globalOnly="true" />
+            <p:messages id="msgerro" globalOnly="true" showDetail="false" showSummary="true"/>
+            <h:form id="tabPartes">
+                <p:dataTable id="tabelaPartes" var="parte" value="#{listaPartesMB.listaPartes}" paginator="true" rows="10" paginatorPosition="bottom" tableStyle="width:auto">
+                    <f:facet name="header"><h:outputText value="Partes cadastradas" /></f:facet>
+                    <p:column style="white-space: normal" id="colunaNome"><f:facet name="header"><h:outputText id="textoNome" value="Nome" /></f:facet>
+                        <p:link id="linkNome" outcome="cadParte" value="#{parte.nome}">
+                            <f:param name="parteCod" value="#{parte.codigo}" />
+                        </p:link>
+                    </p:column>
+                    <p:column id="colunaCpfCnpj"><f:facet name="header"><h:outputText id="textoCpfCnpj" value="CPF/CNPJ" /></f:facet>
+                        <h:outputText id="campoEndereco" value="#{parte.cpfCnpj}" converter="converteCpfCnpj" />
+                    </p:column>
+                    <p:column style="white-space: normal" id="colunaEndereco"><f:facet name="header"><h:outputText id="textoEndereco" value="Endereço" /></f:facet>
+                        <h:outputText id="campoCpfCnpj" value="#{parte.endereco}" />
+                    </p:column>
+                    <f:facet name="footer"><h:outputText value="Total: #{listaPartesMB.quantPartes}" /></f:facet>
+                </p:dataTable>
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</html>

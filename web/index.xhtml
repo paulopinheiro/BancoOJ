@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <f:view>
+        <body>
+            <ui:composition template="./resources/templates/semMenu.xhtml">
+                <ui:define name="titulo">Sistema de Apoio ao Oficial de Justiça - BancoOJ</ui:define>
+                <ui:define name="top">Sistema de Apoio ao Oficial de Justiça - BancoOJ</ui:define>
+                <ui:define name="content">
+                    <h:form id="formLogin">
+                        <p:panelGrid id="gridLogin" columns="2">
+                            <p:outputLabel id="labelOficial" for="oficial" value="Usuário:" />
+                            <p:selectOneMenu id="oficial" value="#{geralMB.oficial}" converter="converteOficial">
+                                <f:selectItem noSelectionOption="true" itemValue="-1" itemLabel="--- Selecione o usuário ---" />
+                                <f:selectItems id="sgiOficial" value="#{geralMB.listaOficiais}" var="oficial" itemValue="#{oficial}" itemLabel="#{oficial}" />
+                            </p:selectOneMenu>
+                            <p:outputLabel id="labelSenha" for="senhaOficial" value="Senha" />
+                            <h:inputSecret id="senhaOficial" value="#{geralMB.senha}" />
+                        </p:panelGrid>
+                        <p:panelGrid id="gridBotoes" columns="1">
+                            <p:commandButton ajax="false" value="Conectar" action="#{geralMB.conectar}">
+                                <f:ajax execute="@form" render="@form :msgerro :gmensagem" />
+                            </p:commandButton>
+                        </p:panelGrid>
+                        <p:growl id="gmensagem" globalOnly="true" />
+                        <p:messages id="msgerro" globalOnly="true" showDetail="false" showSummary="true"/>
+                    </h:form>
+                </ui:define>
+                <ui:define name="bottom">Copyright &copy; 2013 by Paulo Pinheiro</ui:define>
+            </ui:composition>
+        </body>
+    </f:view>
+</html>

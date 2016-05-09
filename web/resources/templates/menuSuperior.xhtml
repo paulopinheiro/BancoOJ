@@ -1,0 +1,85 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <h:outputStylesheet library="css" name="default.css" />
+        <h:outputStylesheet library="css" name="cssLayout.css" />
+        <h:outputScript name="calendar_pt.js" library="js" /> 
+        <script language="javascript" type="text/javascript">
+            function limitText(limitField, limitNum) {
+                if (limitField.value.length > limitNum) {
+                    limitField.value = limitField.value.substring(0, limitNum);
+                }
+            }
+            function doCheckNatural(field) {
+                try {
+                    if (isNaN(field.value)) {
+                        if (field.value.length === 1) {
+                            field.value = 0;
+                        } else {
+                            var fieldLength = field.value.length;
+                            field.value = field.value.substring(0, fieldLength - 1);
+                        }
+                    }
+                } catch (err) {
+                    alert(err.message);
+                }
+            }
+            function doCheckInteger(field) {
+                try {
+                    if (isNaN(field.value)) {
+                        if ((field.value.length !== 1) || (field.value !== "-")) {
+                            if (field.value.length === 1) {
+                                field.value = 0;
+                            } else {
+                                var fieldLength = field.value.length;
+                                field.value = field.value.substring(0, fieldLength - 1);
+                            }
+                        }
+                    }
+                } catch (err) {
+                    alert(err.message);
+                }
+            }
+        </script>
+
+        <h:outputScript name="jsf.js" library="javax.faces"/>
+        <title><ui:insert name="titulo">Título</ui:insert></title>
+    </h:head>
+    <h:body rendered="#{!sessaoMB.oficialSessaoEmpty}">
+        <div align="center" id="top">
+            <h2><ui:insert name="top">Top</ui:insert></h2>
+        </div>
+        <ui:insert name="menu">
+            <h:form id="formMenu">
+                <p:menubar>
+                    <p:submenu label="Cadastro">
+                        <p:menuitem id="menuHome">
+                            <h:link outcome="home" value="Partes cadastradas" />
+                        </p:menuitem>
+                        <p:menuitem id="menuUsuarios" rendered="#{sessaoMB.oficialSessaoAdmin}">
+                            <h:link outcome="cadOficial" value="Usuários" />
+                        </p:menuitem>
+                        <p:menuitem id="menuLocais" rendered="#{sessaoMB.oficialSessaoAdmin}">
+                            <h:link outcome="cadCidade" value="Cidades" />
+                        </p:menuitem>
+                        <p:menuitem id="menuitemSair" value="Sair" action="#{sessaoMB.desconectar()}" />
+                    </p:submenu>
+                </p:menubar>
+            </h:form>
+        </ui:insert>
+        <div align="center" id="content" class="center_content">
+            <ui:insert name="content">Content</ui:insert>
+        </div>
+        <div align="center" id="bottom">
+            <ui:insert name="bottom"><ui:insert name="bottom">Usuário conectado: #{sessaoMB.oficialSessao}</ui:insert></ui:insert>
+        </div>
+    </h:body>
+    <h:body rendered="#{sessaoMB.oficialSessaoEmpty}">
+        <h:link value="Esta página expirou. Retornar à página inicial." outcome="/index.xhtml" />
+    </h:body>
+</html>
